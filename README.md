@@ -1,70 +1,105 @@
-# Getting Started with Create React App
+1. Introduction
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Ce projet a pour objectif de développer une application web en React pour la gestion de comptes bancaires et de transactions, en consommant une API GraphQL via Apollo Client.
+L’interface permet de créer des comptes, d’afficher la liste des comptes, d’ajouter des transactions (dépôts / retraits) et de consulter l’historique des transactions.
 
-## Available Scripts
+2. Prérequis
 
-In the project directory, you can run:
+Node.js ≥ 16 et npm installés
 
-### `npm start`
+Navigateur moderne (Chrome, Firefox, Edge)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+IDE : Visual Studio Code
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Backend GraphQL disponible sur l’URL /graphql
 
-### `npm test`
+3. Installation du projet
+# Cloner ou extraire le projet
+cd gestion-comptes
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+# Installer les dépendances
+npm install
 
-### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Dépendances principales :
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+react, react-dom
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+@apollo/client, graphql
 
-### `npm run eject`
+tailwindcss, postcss, autoprefixer
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+4. Configuration d’Apollo Client
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Fichier src/apollo/client.js :
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Création d’un ApolloClient avec :
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+createHttpLink pointant sur uri: '/graphql'
 
-## Learn More
+InMemoryCache pour la gestion du cache
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+defaultOptions avec fetchPolicy: 'network-only' pour toujours récupérer les données les plus récentes.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Fichier src/App.js :
 
-### Code Splitting
+L’application est encapsulée dans <ApolloProvider client={client}> afin de rendre le client GraphQL disponible dans tous les composants.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+5. Organisation des requêtes et mutations GraphQL
 
-### Analyzing the Bundle Size
+Dossier src/graphql :
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+queries.js
 
-### Making a Progressive Web App
+GET_ALL_COMPTES, GET_COMPTE_BY_ID, GET_TOTAL_SOLDE,
+GET_COMPTE_BY_TYPE, GET_COMPTE_TRANSACTIONS,
+GET_ALL_TRANSACTIONS, GET_TRANSACTION_STATS.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+mutations.js
 
-### Advanced Configuration
+SAVE_COMPTE (création de compte)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+DELETE_COMPTE (suppression de compte)
 
-### Deployment
+ADD_TRANSACTION (ajout d’une transaction).
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+types.js
 
-### `npm run build` fails to minify
+TypeCompte : COURANT, EPARGNE
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+TypeTransaction : DEPOT, RETRAIT.
+
+6. Description des composants React
+
+CreateCompte
+
+Formulaire avec solde et type (COURANT/EPARGNE).
+
+Utilise useMutation(SAVE_COMPTE) pour créer un compte.
+
+Réinitialise le formulaire après succès.
+
+CompteList
+
+Utilise useQuery(GET_ALL_COMPTES) pour afficher tous les comptes.
+
+Affiche id, solde, dateCreation, type.
+
+TransactionForm
+
+Formulaire pour ajouter une transaction (montant, type, compteId).
+
+Utilise useMutation(ADD_TRANSACTION).
+
+TransactionList
+
+Utilise useQuery(GET_ALL_TRANSACTIONS) pour afficher tout l’historique des transactions, avec les infos du compte associé.
+
+7. Lancement et tests
+
+Pour démarrer l’application :
+
+npm start
+
+
+Application accessible sur http://localhost:3000.
